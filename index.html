@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="description" content="OpsGate - WordPress operations with guardrails, not guesswork. Automated monitoring, security scanning, and evidence packs for agencies.">
+  <meta name="keywords" content="WordPress, operations, security, monitoring, agencies, automation">
+  <meta name="author" content="OpsGate">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpsGate – WordPress Operations, Automated</title>
+  
+  <!-- Preload critical resources -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <style>
+    /* Critical CSS - inlined for performance */
+    :root {
+      --bg: #050716;
+      --bg-alt: #0b1022;
+      --card: #10152b;
+      --card-alt: #151b33;
+      --accent: #35e0b8;
+      --accent-soft: rgba(53, 224, 184, 0.12);
+      --accent-strong: #21b392;
+      --text: #f4f7ff;
+      --muted: #9aa3c2;
+      --border-subtle: rgba(255, 255, 255, 0.06);
+      --danger: #ff6b6b;
+      --success: #4ade80;
+      --warning: #fbbf24;
+      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.4);
+      --radius-lg: 18px;
+      --radius-xl: 24px;
+      --radius-pill: 999px;
+      --max-width: 1120px;
+      --transition-fast: 0.18s ease-out;
+      --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #121731 0, #02030a 55%, #000 100%);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    /* Focus styles for accessibility */
+    button:focus-visible,
+    a:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Skip link for keyboard users */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 6px;
+      background: var(--accent);
+      color: var(--bg);
+      padding: 8px 12px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 600;
+      z-index: 100;
+      transition: top 0.3s;
+    }
+
+    .skip-link:focus {
+      top: 6px;
+    }
+
+    /* Enhanced animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.7;
+      }
+    }
+
+    @keyframes ripple {
+      0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+      }
+      100% {
+        transform: scale(20, 20);
+        opacity: 0;
+      }
+    }
+
+    @keyframes rotate {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .fade-in {
+      opacity: 0;
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* NAVBAR */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(18px);
+      background: linear-gradient(to bottom,
+        rgba(5, 7, 22, 0.98),
+        rgba(5, 7, 22, 0.94),
+        rgba(5, 7, 22, 0.88)
+      );
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .nav-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-size: 0.92rem;
+      transition: transform var(--transition-fast);
+    }
+
+    .logo:hover {
+      transform: translateY(-1px);
+    }
+
+    .logo-mark {
+      width: 26px;
+      height: 26px;
+      border-radius: 9px;
+      background: radial-gradient(circle at 30% 0, #ffffff 0, #35e0b8 35%, #1b6e58 70%, #050716 100%);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16),
+                  0 10px 24px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+      transition: transform var(--transition-smooth);
+    }
+
+    .logo:hover .logo-mark {
+      transform: rotate(5deg) scale(1.05);
+    }
+
+    .logo-mark::after {
+      content: "";
+      position: absolute;
+      inset: 6px;
+      border-radius: inherit;
+      border: 1px solid rgba(5, 7, 22, 0.36);
+    }
+
+    .logo-mark span {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .nav-links a {
+      padding: 6px 10px;
+      border-radius: 999px;
+      transition: background var(--transition-fast), color var(--transition-fast);
+    }
+
+    .nav-links a:hover {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+    }
+
+    .nav-cta {
+      padding: 8px 16px;
+      border-radius: var(--radius-pill);
+      background: var(--accent);
+      color: #041016;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(8, 255, 193, 0.28);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+                  background var(--transition-fast);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-cta::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 5px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.5);
+      opacity: 0;
+      border-radius: 100%;
+      transform: scale(1, 1) translate(-50%);
+      transform-origin: 50% 50%;
+    }
+
+    .nav-cta:focus:not(:active)::after {
+      animation: ripple 1s ease-out;
+    }
+
+    .nav-cta:hover {
+      transform: translateY(-1px);
+      background: var(--accent-strong);
+      box-shadow: 0 16px 40px rgba(12, 224, 181, 0.38);
+    }
+
+    /* LAYOUT */
+    main {
+      flex: 1;
+    }
+
+    .section {
+      padding: 56px 20px;
+      position: relative;
+    }
+
+    .section::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent-soft), transparent);
+      bottom: 0;
+      left: 0;
+    }
+
+    .section:last-child::before {
+      display: none;
+    }
+
+    .section-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+
+    .section-header {
+      margin-bottom: 24px;
+      max-width: 600px;
+    }
+
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      font-size: 0.8rem;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    h1 {
+      font-size: clamp(2.4rem, 3vw + 1.6rem, 3.3rem);
+      letter-spacing: -0.03em;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 2vw + 1rem, 2rem);
+      letter-spacing: -0.01em;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    /* HERO */
+    .hero {
+      padding-top: 64px;
+      padding-bottom: 72px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2.5fr);
+      gap: 32px;
+      align-items: center;
+    }
+
+    .hero-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px 4px 4px;
+      border-radius: 999px;
+      background: rgba(9, 255, 196, 0.06);
+      border: 1px solid rgba(53, 224, 184, 0.3);
+      font-size: 0.8rem;
+      margin-bottom: 16px;
+    }
+
+    .hero-kicker-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.4);
+      font-weight: 600;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.11em;
+    }
+
+    .hero-subtitle {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    .hero-subtitle strong {
+      color: #dfe6ff;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+      align-items: center;
+    }
+
+    .btn-primary {
+      padding: 12px 22px;
+      border-radius: var(--radius-pill);
+      border: none;
+      font-weight: 600;
+      font-size: 0.96rem;
+      cursor: pointer;
+      background: linear-gradient(120deg, #35e0b8, #4ff1c0);
+      color: #041016;
+      box-shadow: 0 14px 32px rgba(18, 255, 200, 0.35);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+        filter var(--transition-fast);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 5px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.5);
+      opacity: 0;
+      border-radius: 100%;
+      transform: scale(1, 1) translate(-50%);
+      transform-origin: 50% 50%;
+    }
+
+    .btn-primary:focus:not(:active)::after {
+      animation: ripple 1s ease-out;
+    }
+
+    .btn-primary span.chevron {
+      font-size: 1.1rem;
+      margin-top: 1px;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 42px rgba(18, 255, 200, 0.45);
+      filter: brightness(1.03);
+    }
+
+    .btn-ghost {
+      padding: 11px 18px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(4, 8, 21, 0.7);
+      color: var(--muted);
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: border-color var(--transition-fast),
+        background var(--transition-fast), color var(--transition-fast),
+        transform var(--transition-fast);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-ghost::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 5px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.5);
+      opacity: 0;
+      border-radius: 100%;
+      transform: scale(1, 1) translate(-50%);
+      transform-origin: 50% 50%;
+    }
+
+    .btn-ghost:focus:not(:active)::after {
+      animation: ripple 1s ease-out;
+    }
+
+    .btn-ghost svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .btn-ghost:hover {
+      border-color: rgba(255, 255, 255, 0.42);
+      background: rgba(15, 22, 50, 0.85);
+      color: var(--text);
+      transform: translateY(-1px);
+    }
+
+    .hero-meta {
+      margin-top: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .hero-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 6px rgba(53, 224, 184, 0.22);
+    }
+
+    .hero-panel {
+      border-radius: var(--radius-xl);
+      background: radial-gradient(circle at top left, #2a314f 0, #10152b 40%, #050716 100%);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: var(--shadow-soft);
+      padding: 20px 20px 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-panel::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 0 0, rgba(53, 224, 184, 0.12), transparent 60%),
+        radial-gradient(circle at 100% 0, rgba(110, 161, 255, 0.12), transparent 55%);
+      opacity: 0.85;
+      pointer-events: none;
+    }
+
+    .hero-panel::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(53, 224, 184, 0.05) 0%, transparent 70%);
+      animation: rotate 20s linear infinite;
+      pointer-events: none;
+    }
+
+    .hero-panel-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .hero-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(4, 8, 21, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(223, 230, 255, 0.92);
+    }
+
+    .hero-taglist {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(2, 6, 30, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .hero-status-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .status-card {
+      padding: 9px 10px;
+      border-radius: 14px;
+      background: rgba(3, 7, 25, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 0.76rem;
+    }
+
+    .status-label {
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .status-value {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+
+    .status-badge {
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(7, 26, 22, 0.9);
+      color: var(--accent);
+      border: 1px solid rgba(53, 224, 184, 0.35);
+      font-size: 0.7rem;
+    }
+
+    .status-danger {
+      color: var(--danger);
+    }
+
+    .status-pulse {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 5px rgba(53, 224, 184, 0.3);
+      position: relative;
+    }
+
+    .status-pulse::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 999px;
+      background: var(--accent);
+      animation: pulse 2s infinite;
+    }
+
+    .hero-timeline {
+      margin-top: 6px;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.12);
+      font-size: 0.76rem;
+      color: var(--muted);
+    }
+
+    .hero-timeline strong {
+      color: #dfe6ff;
+    }
+
+    /* GRID UTIL */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    @media (max-width: 880px) {
+      .hero-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .hero {
+        padding-top: 40px;
+      }
+
+      .grid-3,
+      .grid-2 {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .nav-inner {
+        padding-inline: 16px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+      
+      .hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .btn-primary, .btn-ghost {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    /* CARDS & SECTIONS */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      padding: 16px 16px 18px;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+      transition: transform var(--transition-fast), box-shadow var(--transition-smooth);
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .card-alt {
+      background: var(--card-alt);
+    }
+
+    .card-title {
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(2, 6, 23, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .chip-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .pill-soft {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(14, 22, 46, 0.94);
+      font-size: 0.76rem;
+      color: var(--muted);
+    }
+
+    .pill-soft strong {
+      color: #e5ecff;
+      font-weight: 500;
+    }
+
+    .pain-list {
+      padding-left: 18px;
+      margin-top: 8px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .pain-list li {
+      margin-bottom: 5px;
+    }
+
+    .muted-small {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* TIMELINE / PILOT */
+    .pilot-wrap {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.8fr);
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    @media (max-width: 880px) {
+      .pilot-wrap {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .timeline {
+      border-radius: var(--radius-lg);
+      background: var(--card);
+      border: 1px solid var(--border-subtle);
+      padding: 14px 14px 16px;
+      font-size: 0.9rem;
+    }
+
+    .timeline-row {
+      display: grid;
+      grid-template-columns: 90px minmax(0, 1fr);
+      gap: 12px;
+      align-items: flex-start;
+      padding-block: 6px;
+    }
+
+    .timeline-row:not(:last-child) {
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+    }
+
+    .timeline-label {
+      font-weight: 600;
+      color: #dde5ff;
+    }
+
+    .timeline-body {
+      color: var(--muted);
+    }
+
+    .timeline-body strong {
+      color: #e3ebff;
+      font-weight: 500;
+    }
+
+    /* FAQ */
+    .faq-item {
+      border-radius: 14px;
+      border: 1px solid var(--border-subtle);
+      padding: 12px 14px;
+      background: rgba(5, 8, 26, 0.9);
+      margin-bottom: 10px;
+      transition: transform var(--transition-fast);
+    }
+
+    .faq-item:hover {
+      transform: translateX(4px);
+    }
+
+    .faq-question {
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .faq-answer {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 16px 20px 20px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .footer-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(4, 9, 23, 0.9);
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .badge span {
+      color: #e6edff;
+    }
+
+    @media (max-width: 600px) {
+      .nav-links {
+        display: none;
+      }
+      
+      .footer-inner {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    /* Print styles */
+    @media print {
+      .nav, .hero-actions, footer .badge {
+        display: none;
+      }
+      
+      body {
+        background: white;
+        color: black;
+      }
+      
+      .card {
+        border: 1px solid #ddd;
+        box-shadow: none;
+      }
+      
+      .section::before {
+        display: none;
+      }
+    }
+  </style>
+  
+  <!-- Non-critical CSS loaded asynchronously -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  
+  <div class="page">
+    <header class="nav" role="banner">
+      <div class="nav-inner">
+        <a href="#top" class="logo" aria-label="OpsGate Home">
+          <div class="logo-mark">
+            <span>OG</span>
+          </div>
+          <span>OpsGate</span>
+        </a>
+        <nav class="nav-links" aria-label="Main navigation">
+          <a href="#how-it-works">How it works</a>
+          <a href="#features">Features</a>
+          <a href="#pilot">14-Day Pilot</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+        <button class="nav-cta" aria-label="Request a pilot program">
+          Request Pilot
+        </button>
+      </div>
+    </header>
+
+    <main id="main-content">
+      <!-- HERO SECTION -->
+      <section class="section hero" aria-labelledby="hero-heading">
+        <div class="section-inner hero-grid">
+          <div class="fade-in">
+            <div class="hero-kicker">
+              <span class="hero-kicker-pill">WordPress Ops Layer</span>
+              <span class="muted-small">For agencies and security-minded studios</span>
+            </div>
+            <h1 id="hero-heading">WordPress operations with guardrails — not guesswork.</h1>
+            <p class="hero-subtitle">
+              <strong>OpsGate</strong> is a lightweight ops layer that sits above WordPress.
+              It watches your sites, catches plugin & SSL issues early, and gives you
+              a <strong>pilot-ready evidence pack</strong> for clients — without rebuilding your stack.
+            </p>
+
+            <div class="hero-actions">
+              <button class="btn-primary" id="hero-cta">
+                <span>Request a 14-Day Pilot</span>
+                <span class="chevron" aria-hidden="true">➜</span>
+              </button>
+              <button class="btn-ghost" id="how-it-works-btn">
+                <svg viewBox="0 0 20 20" aria-hidden="true">
+                  <circle cx="10" cy="10" r="9" fill="none" stroke="currentColor" stroke-width="1.2" />
+                  <path d="M6 10.2 9 13l5-6" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                See how OpsGate fits your stack
+              </button>
+            </div>
+
+            <div class="hero-meta">
+              <span><span class="dot"></span> Self-hosted lab friendly</span>
+              <span>✔ WordPress + cPanel/FTP focused</span>
+              <span>✔ Evidence packs for client reports</span>
+            </div>
+          </div>
+
+          <div class="hero-panel fade-in" style="animation-delay: 0.2s;">
+            <div class="hero-panel-inner">
+              <div class="hero-panel-header">
+                <span class="hero-pill">Daily Ops Check · Demo</span>
+                <div class="hero-taglist">
+                  <span class="tag">Plugins</span>
+                  <span class="tag">SSL</span>
+                  <span class="tag">Backups</span>
+                  <span class="tag">FTP guardrails</span>
+                </div>
+              </div>
+
+              <div class="hero-status-grid">
+                <div class="status-card">
+                  <div class="status-label">Plugin & Core Scan</div>
+                  <div class="status-value">
+                    <span class="status-pulse" aria-label="Active monitoring"></span>
+                    <span>3 critical updates blocked</span>
+                  </div>
+                  <div class="muted-small">wp-scan_2025-11-07.json</div>
+                </div>
+                <div class="status-card">
+                  <div class="status-label">SSL & Domain</div>
+                  <div class="status-value">
+                    <span class="status-badge">All green</span>
+                    <span class="muted-small">> 30 days remaining</span>
+                  </div>
+                  <div class="muted-small">ops.wpsite.agency → ✅</div>
+                </div>
+                <div class="status-card">
+                  <div class="status-label">Backups</div>
+                  <div class="status-value">
+                    <span>Last backup: <strong>3h ago</strong></span>
+                  </div>
+                  <div class="muted-small">wp_full_2025-11-07-103345.tgz</div>
+                </div>
+                <div class="status-card">
+                  <div class="status-label">FTP Uploads</div>
+                  <div class="status-value">
+                    <span class="status-danger">2 risky uploads blocked</span>
+                  </div>
+                  <div class="muted-small">block-only mode · audit.jsonl</div>
+                </div>
+              </div>
+
+              <div class="hero-timeline">
+                <strong>Next step:</strong> Build pilot evidence pack (MANIFEST.json, PDF summary, logs)
+                and hand it to your client as proof of continuous ops.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- WHO IT'S FOR / PAIN -->
+      <section class="section" aria-labelledby="pain-heading">
+        <div class="section-inner">
+          <div class="section-header">
+            <div class="eyebrow">Why OpsGate</div>
+            <h2 id="pain-heading">Most WordPress ops rely on luck and scattered tools.</h2>
+            <p class="muted">
+              Agencies typically juggle separate tools for backups, SSL, plugin security, and workflow automation.
+              None of them talk to each other, and almost none produce a clean, client-ready audit trail.
+              OpsGate connects the dots.
+            </p>
+          </div>
+
+          <div class="grid-3" style="margin-bottom: 22px;">
+            <div class="card fade-in">
+              <div class="chip">
+                <span class="chip-dot"></span>
+                Agencies
+              </div>
+              <div class="card-title">WordPress Agencies</div>
+              <p class="muted">
+                Keep dozens of client sites under control with daily ops checks, not 2 a.m. emergencies.
+              </p>
+              <div class="pill-row">
+                <span class="pill-soft"><strong>Value:</strong> sell "Ops as a service"</span>
+                <span class="pill-soft"><strong>Time:</strong> hours saved monthly</span>
+              </div>
+            </div>
+
+            <div class="card card-alt fade-in" style="animation-delay: 0.1s;">
+              <div class="chip">
+                <span class="chip-dot"></span>
+                Freelancers
+              </div>
+              <div class="card-title">Solo Devs & Studios</div>
+              <p class="muted">
+                Offer enterprise-style guardrails without hiring a full DevOps team or rewriting your stack.
+              </p>
+              <div class="pill-row">
+                <span class="pill-soft"><strong>Sell:</strong> premium care plans</span>
+                <span class="pill-soft"><strong>Proof:</strong> PDF evidence packs</span>
+              </div>
+            </div>
+
+            <div class="card fade-in" style="animation-delay: 0.2s;">
+              <div class="chip">
+                <span class="chip-dot"></span>
+                SMBs
+              </div>
+              <div class="card-title">Security-conscious SMBs</div>
+              <p class="muted">
+                Get a clear answer to "Are we actually OK?" — with concrete logs and reports you can show auditors.
+              </p>
+              <div class="pill-row">
+                <span class="pill-soft"><strong>Risk:</strong> reduced unknowns</span>
+                <span class="pill-soft"><strong>Compliance:</strong> easier evidence</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card fade-in" style="animation-delay: 0.3s;">
+            <div class="card-title">WordPress ops without guardrails look like this:</div>
+            <ul class="pain-list">
+              <li>Backups configured… but nobody checks if they can be restored.</li>
+              <li>SSL renewals and domain expiry reminders live in personal inboxes.</li>
+              <li>Plugin vulnerability alerts appear, but no one knows if they were fixed in time.</li>
+              <li>No single place where you can say, "Here's proof we did our job this month."</li>
+            </ul>
+            <p class="muted-small" style="margin-top: 6px;">
+              OpsGate turns that chaos into a single, automated evidence layer you can trust.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- HOW IT WORKS -->
+      <section class="section" id="how-it-works" aria-labelledby="how-it-works-heading">
+        <div class="section-inner">
+          <div class="section-header">
+            <div class="eyebrow">How it works</div>
+            <h2 id="how-it-works-heading">A lightweight ops layer that sits above WordPress.</h2>
+            <p class="muted">
+              OpsGate connects a small plugin, an automation engine, and a custom MCP server into one
+              opinionated flow: <strong>watch → analyse → prove</strong>.
+            </p>
+          </div>
+
+          <div class="grid-3">
+            <div class="card fade-in">
+              <div class="chip">
+                <span class="chip-dot"></span>
+                Step 1
+              </div>
+              <div class="card-title">Watch</div>
+              <p class="muted">
+                Scheduled workflows hit your WordPress sites, scan plugins, check SSL and backups,
+                and listen for suspicious FTP uploads.
+              </p>
+              <div class="pill-row">
+                <span class="pill-soft">n8n cron workflows</span>
+                <span class="pill-soft">WPScan / Semgrep hooks</span>
+              </div>
+            </div>
+            <div class="card card-alt fade-in" style="animation-delay: 0.1s;">
+              <div class="chip">
+                <span class="chip-dot"></span>
+                Step 2
+              </div>
+              <div class="card-title">Analyse</div>
+              <p class="muted">
+                Results flow into the MCP server, which normalizes them into a clean JSON manifest
+                and AI-assisted summary ready for humans.
+              </p>
+              <div class="pill-row">
+                <span class="pill-soft">MANIFEST.json</span>
+                <span class="pill-soft">AI "ops briefings"</span>
+              </div>
+            </div>
+            <div class="card fade-in" style="animation-delay: 0.2s;">
+              <div class="chip">
+                <span class="chip-dot"></span>
+                Step 3
+              </div>
+              <div class="card-title">Prove</div>
+              <p class="muted">
+                OpsGate generates a security summary PDF and evidence pack you can send to clients
+                or keep for compliance — every week or month.
+              </p>
+              <div class="pill-row">
+                <span class="pill-soft">PDF reports</span>
+                <span class="pill-soft">audit.jsonl logs</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FEATURES -->
+      <section class="section" id="features" aria-labelledby="features-heading">
+        <div class="section-inner">
+          <div class="section-header">
+            <div class="eyebrow">What it covers</div>
+            <h2 id="features-heading">OpsGate locks down the boring but critical parts of WordPress ops.</h2>
+          </div>
+
+          <div class="grid-2">
+            <div class="card fade-in">
+              <div class="card-title">Plugin & Core Security</div>
+              <p class="muted">
+                Automated plugin and core scans, wired into your existing WordPress stack.
+                Critical issues are surfaced and tracked in the evidence pack.
+              </p>
+              <ul class="pain-list">
+                <li>Track vulnerable plugins across multiple sites.</li>
+                <li>See what was blocked or patched in the last period.</li>
+              </ul>
+            </div>
+            <div class="card card-alt fade-in" style="animation-delay: 0.1s;">
+              <div class="card-title">SSL & Domain Monitoring</div>
+              <p class="muted">
+                Keep an eye on certificate expiry and DNS/URL wiring.
+                OpsGate catches the obvious "site is down" problems before your clients do.
+              </p>
+              <ul class="pain-list">
+                <li>Expiry horizon alerts (e.g., 7, 30, 60 days).</li>
+                <li>Evidence that you checked — not just a ping tool.</li>
+              </ul>
+            </div>
+            <div class="card card-alt fade-in" style="animation-delay: 0.2s;">
+              <div class="card-title">Backups with Proof</div>
+              <p class="muted">
+                Instead of "we think backups are running", OpsGate logs when full site backups were made,
+                where they live, and whether they passed basic health checks.
+              </p>
+              <ul class="pain-list">
+                <li>Backups catalogued in MANIFEST.json.</li>
+                <li>Summary in your monthly client PDF.</li>
+              </ul>
+            </div>
+            <div class="card fade-in" style="animation-delay: 0.3s;">
+              <div class="card-title">FTP Guardrails</div>
+              <p class="muted">
+                Watch for risky uploads and enforce block-only policies in front of your WordPress stack.
+                Suspect files are blocked and logged with context.
+              </p>
+              <ul class="pain-list">
+                <li>"Block-only" mode: deny risky uploads, log everything.</li>
+                <li>Future: quarantine mode for deeper review.</li>
+              </ul>
+            </div>
+          </div>
+
+          <p class="muted-small fade-in" style="margin-top: 16px; animation-delay: 0.4s;">
+            Under the hood, OpsGate is built to be self-hosted and Docker-friendly.
+            It fits into your lab or VPS environment today, with a path to managed SaaS tomorrow.
+          </p>
+        </div>
+      </section>
+
+      <!-- PILOT -->
+      <section class="section" id="pilot" aria-labelledby="pilot-heading">
+        <div class="section-inner">
+          <div class="section-header">
+            <div class="eyebrow">Pilot program</div>
+            <h2 id="pilot-heading">Run OpsGate on 3–5 sites for 14 days and walk away with a proof-pack.</h2>
+            <p class="muted">
+              The pilot is a short, focused run where we wire OpsGate into a handful of sites,
+              collect real-world signals, and hand you an evidence pack you can show to clients,
+              partners, or your own team.
+            </p>
+          </div>
+
+          <div class="pilot-wrap">
+            <div class="timeline fade-in">
+              <div class="timeline-row">
+                <div class="timeline-label">Days 1–3</div>
+                <div class="timeline-body">
+                  <strong>Setup & Baseline.</strong> Connect WordPress sites, confirm backup paths,
+                  verify SSL details, and run the first scans. Establish a clean "before" snapshot.
+                </div>
+              </div>
+              <div class="timeline-row">
+                <div class="timeline-label">Days 4–10</div>
+                <div class="timeline-body">
+                  <strong>Daily Ops Checks.</strong> Let OpsGate run on its own. You'll receive
+                  internal-facing ops emails and can peek at logs whenever you want.
+                </div>
+              </div>
+              <div class="timeline-row">
+                <div class="timeline-label">Days 11–14</div>
+                <div class="timeline-body">
+                  <strong>Pilot Evidence Pack.</strong> We package a MANIFEST.json, ops summary PDF,
+                  and a small README so you can see exactly what OpsGate watched and caught.
+                </div>
+              </div>
+            </div>
+
+            <div class="card card-alt fade-in" style="animation-delay: 0.2s;">
+              <div class="card-title">What you get at the end</div>
+              <p class="muted">
+                A single zipped <code>pilot_pack_*.zip</code> containing:
+              </p>
+              <ul class="pain-list">
+                <li><strong>MANIFEST.json</strong> — machine-readable snapshot of scans and checks.</li>
+                <li><strong>Security summary PDF</strong> — human-readable overview for clients.</li>
+                <li><strong>Audit trail references</strong> — where logs and backups live.</li>
+              </ul>
+              <p class="muted">
+                From there, you can decide whether to extend OpsGate across more sites,
+                integrate it deeper into your agency workflows, or keep it as a "silent guardian"
+                for your most critical WordPress projects.
+              </p>
+              <button class="btn-primary" style="margin-top: 10px;" id="pilot-cta">
+                Request Pilot Details
+              </button>
+              <p class="muted-small" style="margin-top: 8px;">
+                <code>cybereclipseagency@gmail.com</code>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section class="section" id="faq" aria-labelledby="faq-heading">
+        <div class="section-inner">
+          <div class="section-header">
+            <div class="eyebrow">Questions</div>
+            <h2 id="faq-heading">FAQ</h2>
+          </div>
+
+          <div class="faq-item fade-in">
+            <div class="faq-question">Is OpsGate SaaS or self-hosted?</div>
+            <div class="faq-answer">
+              Today, OpsGate is designed to run in a self-hosted lab or VPS environment using Docker.
+              The current focus is a <strong>WordPress-first ops prototype</strong> proving the concept
+              with agencies and SMBs. A managed SaaS offering can follow once the pilot pattern is locked.
+            </div>
+          </div>
+
+          <div class="faq-item fade-in" style="animation-delay: 0.1s;">
+            <div class="faq-question">Will OpsGate change my existing WordPress hosting setup?</div>
+            <div class="faq-answer">
+              No. OpsGate sits "around" your existing hosting. It talks to WordPress, your FTP/cPanel
+              environment, and your SSL endpoints, but it doesn't force you to re-host on a specific platform.
+            </div>
+          </div>
+
+          <div class="faq-item fade-in" style="animation-delay: 0.2s;">
+            <div class="faq-question">What's the pricing model?</div>
+            <div class="faq-answer">
+              For the pilot phase, pricing is intentionally simple: a flat pilot fee per batch of sites,
+              then a per-site or per-bundle subscription once you're in production.
+              The exact numbers will depend on your agency size and how many sites you want covered.
+            </div>
+          </div>
+
+          <div class="faq-item fade-in" style="animation-delay: 0.3s;">
+            <div class="faq-question">Does this replace our existing security plugins?</div>
+            <div class="faq-answer">
+              No — OpsGate isn't another monolithic WordPress plugin. It's an <strong>ops and evidence layer</strong>.
+              You can keep using your favourite security plugins; OpsGate focuses on orchestrating checks and
+              giving you a single, auditable story of what actually happened.
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer role="contentinfo">
+      <div class="footer-inner">
+        <span>© <span id="year"></span> OpsGate. WordPress operations, automated.</span>
+        <div class="badge">
+          <span>Ops Layer</span>
+          <span aria-hidden="true">·</span>
+          <span>Built for agencies & SMBs</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Enhanced JavaScript with performance and accessibility improvements
+    document.addEventListener('DOMContentLoaded', function() {
+      // Set current year
+      document.getElementById('year').textContent = new Date().getFullYear();
+      
+      // Add intersection observer for fade-in animations
+      const fadeElements = document.querySelectorAll('.fade-in');
+      
+      const fadeObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.animationPlayState = 'running';
+            fadeObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      
+      fadeElements.forEach(el => {
+        el.style.animationPlayState = 'paused';
+        fadeObserver.observe(el);
+      });
+      
+      // Smooth scrolling for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            target.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
+        });
+      });
+      
+      // Button click handlers
+      document.getElementById('hero-cta').addEventListener('click', function() {
+        document.getElementById('pilot').scrollIntoView({behavior:'smooth'});
+      });
+      
+      document.getElementById('how-it-works-btn').addEventListener('click', function() {
+        document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'});
+      });
+      
+      document.getElementById('pilot-cta').addEventListener('click', function() {
+        window.location.href = 'mailto:hello@example.com?subject=OpsGate%20Pilot%20Request';
+      });
+      
+      document.querySelector('.nav-cta').addEventListener('click', function() {
+        document.getElementById('pilot').scrollIntoView({behavior:'smooth'});
+      });
+      
+      // Add loading state for buttons
+      document.querySelectorAll('.btn-primary, .nav-cta').forEach(button => {
+        button.addEventListener('click', function() {
+          const originalText = this.innerHTML;
+          this.innerHTML = '<span>Processing...</span>';
+          this.disabled = true;
+          
+          // Simulate API call - replace with actual implementation
+          setTimeout(() => {
+            this.innerHTML = originalText;
+            this.disabled = false;
+          }, 1500);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
